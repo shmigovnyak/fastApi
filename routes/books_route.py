@@ -1,50 +1,42 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
 from typing import List, Optional, Union
-
-# 1. Создать модель книги Book
-class Book(BaseModel):
-    id: int
-    title: str
-    author: str
-
-# Исходные данные книг
-books_list = [
-    {"id": 1, "title": "1984", "author": "George Orwell"},
-    {"id": 2, "title": "To Kill a Mockingbird", "author": "Harper Lee"},
-    {"id": 3, "title": "Brave New World", "author": "Aldous Huxley"},
-]
-
-# Модель для запроса поиска книг
-class BookSearchRequest(BaseModel):
-    title: Optional[str] = Field(None, description="Наименование книги для поиска")
-    author: Optional[str] = Field(None, description="Автор книги для поиска")
+from schemas.book_schemas import Book, BookCreate, BookUpdate, BookSearchRequest
+from service import book_service
 
 router = APIRouter(
     prefix="/v1/books",
     tags=["books"],
 )
 
-# 2. Реализовать POST метод /v1/books/search
-@router.post("/search", response_model=Book)
-async def search_book(search_params: BookSearchRequest):
-    if not search_params.title and not search_params.author:
-        raise HTTPException(status_code=400, detail="Необходимо указать название или автора для поиска")
+# CRUD методы для книг
 
-    for book_data in books_list:
-        book = Book(**book_data)
-        if (search_params.title and book.title == search_params.title) or \
-           (search_params.author and book.author == search_params.author):
-            return book
+@router.post("/", response_model=Book)
+async def create_book_route(book: BookCreate):
+    return await book_service.create_book(book)
 
-    raise HTTPException(status_code=404, detail="Книга не найдена")
+@router.get("/", response_model=List[Book])
+async def read_books_route():
+    return await book_service.read_books()
 
-# 3. Реализовать GET метод /v1/books/uppercase
 @router.get("/uppercase", response_model=List[Book])
-async def get_books_uppercase():
-    uppercase_books = []
-    for book_data in books_list:
-        uppercase_book_data = book_data.copy()
-        uppercase_book_data["title"] = uppercase_book_data["title"].upper()
-        uppercase_books.append(Book(**uppercase_book_data))
-    return uppercase_books 
+async def get_books_uppercase_route():
+    return await book_service.get_books_uppercase()
+
+@router.get("/{book_id}", response_model=Book)
+async def read_book_route(book_id: int):
+    return await book_service.read_book(book_id)
+
+@router.put("/{book_id}", response_model=Book)
+async def update_book_route(book_id: int, book_update: BookCreate):
+    return await book_service.update_book(book_id, book_update)
+
+@router.patch("/{book_id}", response_model=Book)
+async def partial_update_book_route(book_id: int, book_update: BookUpdate):
+    return await book_service.partial_update_book(book_id, book_update)
+
+@router.delete("/{book_id}", response_model=dict)
+async def delete_book_route(book_id: int):
+    return await book_service.delete_book(book_id)
+@router.post("/search", response_model=Book)
+async def search_book_route(search_params: BookSearchRequest):
+    return await book_service.search_book(search_params)
