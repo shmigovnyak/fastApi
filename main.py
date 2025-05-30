@@ -11,11 +11,4 @@ app.include_router(users_router)
 app.include_router(books_router)
 
 
-@app.get("/")
-async def home():
-    return {"message": "Hello World"}
 
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
