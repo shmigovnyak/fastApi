@@ -3,8 +3,8 @@ from fastapi import HTTPException
 from schemas.user_schemas import User, UserCreate
 from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
-from service.db import SessionLocal
-from service.models import User as UserModel
+from db import SessionLocal
+from models.models import User as UserModel
 
 users_list: List[User] = []
 user_id_counter = 0

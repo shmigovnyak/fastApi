@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException
-from typing import List, Optional
+from fastapi import APIRouter
+from typing import List
 from schemas.user_schemas import User, UserCreate
 from service import user_service
 

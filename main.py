@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from routes.users_route import router as users_router
 from routes.books_route import router as books_router
-from service.db import engine, Base
+from db import engine, Base
 
 app = FastAPI()
 
