@@ -8,6 +8,9 @@ class User(BaseModel):
     email: EmailStr
     is_active: bool = True
 
+    class Config:
+        from_attributes = True
+
 
 class UserCreate(BaseModel):
     username: str
